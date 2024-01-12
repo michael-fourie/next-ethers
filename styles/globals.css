@@ -115,3 +115,55 @@ a {
     width: 200px;
   }
 }
+
+/* YourComponent.css */
+body {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 25px; /* Adjust the gap between grid items as needed */
+  max-width: 600px; /* Set your desired maximum width */
+  margin: auto; /* Center the grid horizontally */
+}
+
+.grid-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000; /* Blue background, you can change it to your desired color */
+  color: #fff; /* White text color */
+  padding: 20px;
+  border: 1px solid white;
+} 
+
+.bold-text {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.green-text {
+  font-size: 22px;
+  color: #00ff00; /* Green text color */
+}
+
+.courier-font {
+  font-family: 'Courier New', monospace;
+}
+
+.dark-grey-text {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 10px;
+  color: #7a7a7a; /* Dark grey color */
+  font-size: 20px;
+  font-family: 'Courier New', monospace;
+}
