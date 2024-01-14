@@ -357,7 +357,7 @@ const Index = () => {
             ) : (
               <>
                 <br />
-                <button className="btn connect-btn" onClick={connectWeb3}>
+                <button className="btn connect-btn-btm" onClick={connectWeb3}>
                   Connect Wallet
                 </button>
               </>
