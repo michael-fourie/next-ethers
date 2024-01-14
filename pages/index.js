@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
-import { signMessage } from "../utils/sign";
+import { executePeasArb } from "../utils/executePeasArb";
 import { ethers } from "ethers"; // Import ethers.js library
 import Link from "next/link";
 import Metamask from "../component/metamask";
 import { CONTRACT1_ABI, CONTRACT2_ABI, PAIR_ABI } from '../utils/abi'; // Replace with your contract ABIs
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const BigNumber = require('bignumber.js');
+
+const PodMap = {
+  option1: 'ppPP',
+  // Add more options as needed
+};
 
 const Index = () => {
   const [haveMetamask, sethaveMetamask] = useState(true);
@@ -16,19 +24,29 @@ const Index = () => {
   const [arbProfit1, setArbProfit1] = useState(0)
   const [arbProfit2, setArbProfit2] = useState(0)
 
+  const [buyAmount, setBuyAmount] = useState(5000);
+  const [pod, setPod] = useState(Object.keys(PodMap)[0]); // Set default value
+  const [gwei, setGwei] = useState('currentGwei'); // Set default value
+
   const [client, setclient] = useState({
     isConnected: false,
   });
+  
+  const handleAmountChange = (e) => {
+    setBuyAmount(e.target.value);
+    fetchDataFromContracts()
+  };
 
-  useEffect(() => {
-    // Set up an interval to call the function every second
-    const intervalId = setInterval(() => {
-      fetchDataFromContracts();
-    }, 1000); // 1000 milliseconds = 1 second
+  const handlePodChange = (e) => {
+    setPod(e.target.value);
+    fetchDataFromContracts()
+  };
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+  // Assuming you want to allow users to change the preset Gwei value
+  const handleGweiChange = (e) => {
+    setGwei(e.target.value);
+    fetchDataFromContracts()
+  };
 
 
   const checkConnection = async () => {
@@ -94,8 +112,6 @@ const Index = () => {
       );
       const contract2Result = await contract2.getReserves(); // Replace yourFunction with the actual function name
       setContract2Data(contract2Result);
-      console.log(contract1Result)
-      console.log(contract2Result)
       let peas_address = await contract1.token0()
       let peas_contract = new ethers.Contract(peas_address, CONTRACT2_ABI, provider)
       let symbol = await peas_contract.symbol()
@@ -127,19 +143,19 @@ const Index = () => {
       const price0 = sqrdValue
       const price1 = price1_in_terms_of_0
 
+      
       setPeasPrice(price0.toPrecision(4))
       setppPPPrice(price1.toNumber().toPrecision(4))
 
       let fee_rate0 = 0.01  
       let fee_rate1 = 0.03  
 
-      let buy_amount = 1000
-      let cost0 = price0 * buy_amount
-      let amount_after0 = buy_amount * (1-fee_rate0)
+      let cost0 = price0 * buyAmount
+      let amount_after0 = buyAmount * (1-fee_rate0)
       let value0 = amount_after0 * price1
   
-      let cost1 = price1 * buy_amount
-      let amount_after1 = buy_amount * (1-fee_rate1)
+      let cost1 = price1 * buyAmount
+      let amount_after1 = buyAmount * (1-fee_rate1)
       let value1 = amount_after1 * price0
   
       const profit0 = value0 - cost0
@@ -152,18 +168,28 @@ const Index = () => {
     }
   };
 
+  const getGas = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    let gasPrice = await provider.getGasPrice()
+    const gasPriceInGwei = new BigNumber(gasPrice.toString()).div(1e9); // Assuming gasPrice is in Wei
+    setGwei(gasPriceInGwei); // Convert to string to avoid precision issues
+  }
+
   useEffect(() => {
     checkConnection();
     fetchDataFromContracts(); // Fetch data when the component mounts
+    getGas()
   }, []);
 
   return (
     <>
       {/* Navbar */}
+      
       <nav className="fren-nav d-flex">
         <div>
           <h3>Peapod Arbitrage Dashboard</h3>
         </div>
+        <ToastContainer />
         <div className="d-flex" style={{ marginLeft: "auto" }}>
           <div>
             <button className="btn connect-btn" onClick={connectWeb3}>
@@ -184,7 +210,8 @@ const Index = () => {
       <section className="container d-flex">
         <main>
           <h1 className="main-title">Peapod Finance Arbitrage Dashboard</h1>
-
+          <p className="main-desc">Manually arbitrage on Pods, fuel the flywheel.</p>
+          
           {/* ---- */}
           <p>
             {!haveMetamask ? (
@@ -192,33 +219,77 @@ const Index = () => {
             ) : client.isConnected ? (
               <>
                 <br />
-                
+                <div className="input-form">
+                  <div className="input-group">
+                    <label htmlFor="buyAmount" className="label">
+                      Amount
+                    </label>
+                    <input
+                      type="number"
+                      id="amount"
+                      value={buyAmount}
+                      onChange={handleAmountChange}
+                      className="input"
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="pod" className="label">
+                      Pod
+                    </label>
+                    <select id="pod" value={pod} onChange={handlePodChange} className="input">
+                      {Object.entries(PodMap).map(([key, value]) => (
+                        <option key={key} value={key}>
+                          {value}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="gwei" className="label">
+                      Gwei
+                    </label>
+                    <input
+                      type="text"
+                      id="gwei"
+                      value={gwei}
+                      onChange={handleGweiChange}
+                      className="input"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid-container">
                   <div className="grid-item bold-text">$PEAS</div>
                   <div className="grid-item bold-text">$ppPP</div>
                   <div className="grid-item green-text courier-font">${peasPrice}</div>
                   <div className="grid-item green-text courier-font">${ppPPPrice}</div>
-                  <div className="grid-item bold-text">Profit buying 1000 $PEAS, wrapping, and selling</div>
-                  <div className="grid-item bold-text">Profit buying 1000 $ppPP, unwrapping, and selling</div>
-                  <div className="grid-item green-text courier-font">${arbProfit1}</div>
-                  <div className="grid-item green-text courier-font">${arbProfit2}</div>
+                  
+                  {/* <div className="grid-item bold-text">Profit buying {buyAmount} $ppPP, unwrapping, and selling</div> */}
+                  {/* <div className="grid-item green-text courier-font">${arbProfit2}</div> */}
 
-                  <button
-                  onClick={signMessage}
-                  type="button"
-                  className="btn sign-btn"
-                >
-                  Arbitrage $PEAS to $ppPP
-                </button>
-
-                <button
+                {/* <button
                   onClick={signMessage}
                   type="button"
                   className="btn sign-btn"
                 >
                   Arbitrage $ppPP to $PEAS
-                </button>
+                </button> */}
                 </div>
+
+
+                <div className="profit-display">
+                  <div className="grid-item bold-text">Profit from {buyAmount} $PEAS, wrapping, and selling</div>
+                  <div className="grid-item green-text courier-font">${arbProfit1}</div>
+                </div>
+
+                <button
+                  onClick={() => executePeasArb(buyAmount)}
+                  className="btn sign-btn"
+                >
+                  Arbitrage $PEAS
+                </button>
               </>
             ) : (
               <>
