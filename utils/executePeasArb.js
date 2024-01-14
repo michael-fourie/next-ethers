@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import BigNumber from "bignumber.js";
 
 export const executePeasArb = async (daiAmount) => {
   const contractAddress = "0x8A581E373544047716bFC2aaa9c3Ad3df27E016b";
@@ -20,11 +21,13 @@ export const executePeasArb = async (daiAmount) => {
 
     // Instantiate the contract
     const contract = new ethers.Contract(contractAddress, abi, signer);
-    console.log(daiAmount)
+    console.log("Input: ", daiAmount)
+    const weiValue = ethers.utils.parseEther(daiAmount.toString());
+    console.log(`Equivalent Wei value: ${weiValue.toString()}`);
     // Call the arbAllThePeas function with the specified daiAmount
-    const transaction = await contract.arbAllThePeas(daiAmount);
+    const transaction = await contract.arbAllThePeas(weiValue);
 
-    // Wait for the transaction to be mined
+    // // Wait for the transaction to be mined
     await transaction.wait();
 
     console.log("arbAllThePeas transaction successful!");
@@ -34,7 +37,7 @@ export const executePeasArb = async (daiAmount) => {
     let errorMessage = "Error executing Peas Arb: " + error.message;
   
     if (error.message.includes("PAYBACK0")) {
-      errorMessage = "Arbitrage not profitable after gas and fees";
+      errorMessage = "Arbitrage not profitable after fees";
     } else if (error.message.includes("INSUFFICIENT_INPUT_AMOUNT")) {
       errorMessage = "Insufficient Input Amount";
     } else if (error.message.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {

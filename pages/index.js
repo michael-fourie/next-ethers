@@ -6,6 +6,8 @@ import Metamask from "../component/metamask";
 import { CONTRACT1_ABI, CONTRACT2_ABI, PAIR_ABI } from '../utils/abi'; // Replace with your contract ABIs
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/router';
+
 
 const BigNumber = require('bignumber.js');
 
@@ -15,6 +17,8 @@ const PodMap = {
 };
 
 const Index = () => {
+  const [showModal, setShowModal] = useState(true);
+
   const [haveMetamask, sethaveMetamask] = useState(true);
   const [contract1Data, setContract1Data] = useState("");
   const [contract2Data, setContract2Data] = useState("");
@@ -24,15 +28,17 @@ const Index = () => {
   const [arbProfit1, setArbProfit1] = useState(0)
   const [arbProfit2, setArbProfit2] = useState(0)
 
-  const [buyAmount, setBuyAmount] = useState(5000);
+  const [buyAmount, setBuyAmount] = useState(0);
   const [pod, setPod] = useState(Object.keys(PodMap)[0]); // Set default value
   const [gwei, setGwei] = useState('currentGwei'); // Set default value
 
   const [client, setclient] = useState({
     isConnected: false,
   });
-  
+
+
   const handleAmountChange = (e) => {
+    console.log("New amount: ", e.target.value)
     setBuyAmount(e.target.value);
     fetchDataFromContracts()
   };
@@ -47,7 +53,6 @@ const Index = () => {
     setGwei(e.target.value);
     fetchDataFromContracts()
   };
-
 
   const checkConnection = async () => {
     const { ethereum } = window;
@@ -112,9 +117,6 @@ const Index = () => {
       );
       const contract2Result = await contract2.getReserves(); // Replace yourFunction with the actual function name
       setContract2Data(contract2Result);
-      let peas_address = await contract1.token0()
-      let peas_contract = new ethers.Contract(peas_address, CONTRACT2_ABI, provider)
-      let symbol = await peas_contract.symbol()
       let result = await contract1.slot0()
       let sqrtPrice = result[0]
       let value = sqrtPrice / 2**96
@@ -127,7 +129,6 @@ const Index = () => {
       let token1_address = await contract2.token1();
       let token0_contract = new ethers.Contract(token0_address, CONTRACT2_ABI, provider);
       let token1_contract = new ethers.Contract(token1_address, CONTRACT2_ABI, provider);
-      let symbol0 = await token0_contract.symbol();
       let decimals0 = await token0_contract.decimals();
       let decimals1 = await token1_contract.decimals();
       let adjustedReserve0 = reserve0.dividedBy(new BigNumber(10).pow(decimals0));
@@ -146,6 +147,9 @@ const Index = () => {
       
       setPeasPrice(price0.toPrecision(4))
       setppPPPrice(price1.toNumber().toPrecision(4))
+
+      console.log("$PEAS is ", peasPrice)
+      console.log("$ppPP is ", ppPPPrice)
 
       let fee_rate0 = 0.01  
       let fee_rate1 = 0.03  
@@ -181,13 +185,36 @@ const Index = () => {
     getGas()
   }, []);
 
+  const router = useRouter();
+
+  const redirectToTwitter = () => {
+    // Replace 'twitter_username' with the actual Twitter username
+    const twitterUrl = 'https://twitter.com/cyberetard';
+
+    // Redirect to Twitter URL
+    router.push(twitterUrl);
+  };
+
   return (
     <>
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>This is a tool for manual arbitrage on Peapods Finance Pods.</h2>
+            <br></br>
+            <p>This tool is only valid for Peapods v1. Upon launch of v2, a new tool will be deployed to work across all pods</p>
+            <p>Please use a wallet that simulates transaction output, like Rabby, to assure that the transaction is profitable</p>
+            <p>The amount of $DAI entered into the tool is flashloaned, so you require no $DAI in your wallet to use this</p>
+            <p>Even if the tool displays that an arb is profitable, you may get an error as Flashloan fee's cause it to no longer be profitable. The profit must be large enough to offset fee's.</p>
+            <button className="close-btn" onClick={() => setShowModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
       {/* Navbar */}
       
       <nav className="fren-nav d-flex">
         <div>
-          <h3>Peapod Arbitrage Dashboard</h3>
+          <h3>PeArb</h3>
         </div>
         <ToastContainer />
         <div className="d-flex" style={{ marginLeft: "auto" }}>
@@ -209,7 +236,7 @@ const Index = () => {
 
       <section className="container d-flex">
         <main>
-          <h1 className="main-title">Peapod Finance Arbitrage Dashboard</h1>
+          <h1 className="main-title">Peapod Arbitrage Tool</h1>
           <p className="main-desc">Manually arbitrage on Pods, fuel the flywheel.</p>
           
           {/* ---- */}
@@ -219,10 +246,11 @@ const Index = () => {
             ) : client.isConnected ? (
               <>
                 <br />
+
                 <div className="input-form">
                   <div className="input-group">
                     <label htmlFor="buyAmount" className="label">
-                      Amount
+                      Amount ($DAI)
                     </label>
                     <input
                       type="number"
@@ -266,29 +294,23 @@ const Index = () => {
                   <div className="grid-item green-text courier-font">${peasPrice}</div>
                   <div className="grid-item green-text courier-font">${ppPPPrice}</div>
                   
-                  {/* <div className="grid-item bold-text">Profit buying {buyAmount} $ppPP, unwrapping, and selling</div> */}
-                  {/* <div className="grid-item green-text courier-font">${arbProfit2}</div> */}
-
-                {/* <button
-                  onClick={signMessage}
-                  type="button"
-                  className="btn sign-btn"
-                >
-                  Arbitrage $ppPP to $PEAS
-                </button> */}
+                  {/* <div className="grid-item bold-text">Profit buying {buyAmount} $ppPP, unwrapping, and selling</div>
+                  <div className="grid-item green-text courier-font">${arbProfit2}</div> */}
                 </div>
 
 
                 <div className="profit-display">
                   <div className="grid-item bold-text">Profit from {buyAmount} $PEAS, wrapping, and selling</div>
                   <div className="grid-item green-text courier-font">${arbProfit1}</div>
+                  <div className="grid-item bold-text">Profit buying {buyAmount} $ppPP, unwrapping, and selling</div>
+                  <div className="grid-item green-text courier-font">${arbProfit2}</div>
                 </div>
 
                 <button
                   onClick={() => executePeasArb(buyAmount)}
                   className="btn sign-btn"
                 >
-                  Arbitrage $PEAS
+                  Arbitrage
                 </button>
               </>
             ) : (
@@ -299,9 +321,9 @@ const Index = () => {
                 </button>
               </>
             )}
+          <div className="dark-grey-text" onClick={redirectToTwitter}>Built by @cyberetard</div>
           </p>
           {/* ---- */}
-        <div className="dark-grey-text">Built by @cyberetard</div>
         </main>
       </section>
     </>

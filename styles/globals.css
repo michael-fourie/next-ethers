@@ -13,12 +13,16 @@ body {
   background-color: #000;
   color: #fff;
   max-height: 100vh;
-  overflow: hidden;
+  max-width: 390px; /* Adjust this value as needed */
+  margin-left: auto;
+  margin-right: auto;
 }
+
+
 .profit-display{
-  width: 42%;
+  width: 100%;
   margin: auto;
-  margin-top: 2em;
+  margin-top: 1em;
 }
 
 a {
@@ -42,7 +46,7 @@ a {
   background: url('/stars.png');
 
 }
-
+ct-
 .btn {
   border: none;
   outline: none;
@@ -75,14 +79,15 @@ a {
 }
 
 .main-title {
-  font-size: 70px;
+  font-size: 50px;
   font-weight: 900;
+  margin-top: 35%;
   font-style: italic;
   font-family: 'Montserrat', serif;
 }
 
 .main-desc {
-  font-size: 20px;
+  font-size: 18px;
   text-align: center;
   color: #F2F2F2;
   padding: 10px;
@@ -91,51 +96,64 @@ a {
 
 .sign-btn {
   margin-top: 20px;
-  font-size: 18px;
+  font-size: 24px;
   border-radius: 15px;
-  padding: 15px 20px;
+  padding: 15px 30px;
   background: #745EDA;
   color: #F2F2F2;
   border: 1px solid #FFFFFF;
+  cursor: pointer;
+}
+
+.close-btn {
+    margin-top: 20px;
+    font-size: 18px;
+    border-radius: 15px;
+    padding: 15px 30px;
+    background: #745EDA;
+    color: #F2F2F2;
+    border: 1px solid #FFFFFF;
+    cursor: pointer;
+    margin-left: auto; /* Center-align the button */
+    margin-right: auto;
+    display: block; 
 }
 
 /* media query for mobile devices */
 @media only screen and (max-width: 600px) {
   .fren-nav {
     padding: 20px;
+    margin-top: 2em;
   }
 
   .main-title {
-    font-size: 35px;
+    font-size: 28px;
+    margin-top: 5em;
   }
 
   .main-desc,
   p {
-    font-size: 17px;
+    font-size: 16px;
     line-height: 20px;
   }
 
   .sign-btn {
     font-size: 15px;
     width: 200px;
+    margin-bottom: 2em;
+  }
+  .body {
+    max-width: 390px;
   }
 }
 
-/* YourComponent.css */
-body {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
 
 .grid-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   column-gap: 25px; /* Adjust the gap between grid items as needed */
-  max-width: 600px; /* Set your desired maximum width */
+  max-width: 100%; /* Set your desired maximum width */
   margin: auto; /* Center the grid horizontally */
 }
 
@@ -147,15 +165,16 @@ body {
   color: #fff; /* White text color */
   padding: 20px;
   border: 1px solid white;
+  background-color: #101010;
 } 
 
 .bold-text {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: bold;
 }
 
 .green-text {
-  font-size: 22px;
+  font-size: 20px;
   color: #00ff00; /* Green text color */
 }
 
@@ -164,24 +183,28 @@ body {
 }
 
 .dark-grey-text {
-  position: fixed;
   bottom: 0;
   left: 0;
   padding: 10px;
-  color: #7a7a7a; /* Dark grey color */
+  color: #949494; /* Dark grey color */
   font-size: 20px;
+  margin-left: 0%;
   font-family: 'Courier New', monospace;
+  text-decoration: underline; /* Add this line to make the text underlined */
+  cursor: pointer;
 }
 
 .input-form {
-  background-color: black;
+  background-color: #101010;
   color: white;
   border: 1px solid white;
   padding: 20px;
-  width: 300px;
   margin: auto;
   text-align: center;
-  margin-bottom: 3em;
+  margin-bottom: 1em;
+
+  width: 100%;
+  box-sizing: border-box; /* Ensure consistent box sizing */
 }
 
 .input-group {
@@ -201,4 +224,50 @@ body {
   background-color: black;
   color: white;
   border: 1px solid white;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  margin: auto;
+}
+
+.modal-content {
+  background: #030303;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 80%;
+  text-align: left; /* Align text to the left */
+  border: 2px solid white;
+
+}
+
+.modal-content p {
+  margin-bottom: 10px;
+  padding-left: 20px; /* Add left padding for bullet points */
+  position: relative;
+}
+.modal-content p::before {
+  content: "\2022"; /* Unicode character for a bullet point */
+  position: absolute;
+  left: 0;
+  margin-left: -10px; /* Adjust the margin to align with the padding */
+  color: #ffffff; /* Bullet point color */
+  font-size: 20px;
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    max-width: 100%;
+    overflow-x: hidden; /* Hide horizontal overflow to prevent scrolling */
+  }
 }
