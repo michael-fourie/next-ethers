@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { executePeasArb } from "../utils/executePeasArb";
+
 import { ethers } from "ethers"; // Import ethers.js library
 import Link from "next/link";
 import Metamask from "../component/metamask";
@@ -195,6 +196,24 @@ const Index = () => {
     router.push(twitterUrl);
   };
 
+  const redirectToUniswap = () => {
+    // Replace 'twitter_username' with the actual Twitter username
+    const uniswapUrl = 'https://app.uniswap.org/#/swap?exactField=input&exactAmount='+buyAmount+'&inputCurrency=0x6B175474E89094C44Da98b954EedeAC495271d0F&outputCurrency=0x515e7fd1C29263DFF8d987f15FA00c12cd10A49b';
+
+    // Redirect to Twitter URL
+    window.open(uniswapUrl, '_blank');
+  };
+
+  const redirectToPeapods = () => {
+    // Replace 'twitter_username' with the actual Twitter username
+    const twitterUrl = 'https://peapods.finance/app/unwrap';
+
+    // Redirect to Twitter URL
+    window.open(twitterUrl, "_blank");
+  };
+
+
+
   return (
     <>
       {showModal && (
@@ -297,12 +316,34 @@ const Index = () => {
                   {/* <div className="grid-item bold-text">Profit buying {buyAmount} $ppPP, unwrapping, and selling</div>
                   <div className="grid-item green-text courier-font">${arbProfit2}</div> */}
                 </div>
+                
+                <div className="profit-display">
+                  <div className="grid-item bold-text">Total $PEAS from buying ${buyAmount} worth</div>
+                  <div className="grid-item green-text courier-font">{(buyAmount / peasPrice).toPrecision(6)}</div>
 
+                  <div className="grid-item bold-text">Total $PEAS from buying ${buyAmount} of $ppPP, and unwrapping to $PEAS after fee's</div>
+                  <div className="grid-item green-text courier-font">{((buyAmount/ppPPPrice) * 0.97).toPrecision(6)}</div>
+                </div>
+                
+
+                <button
+                  onClick={redirectToUniswap}
+                  className="btn sign-btn"
+                >
+                  Buy on Uniswap
+                </button>
+
+                <button
+                  onClick={redirectToPeapods}                  
+                  className="btn sign-btn"
+                >
+                  Unwrap to $PEAS
+                </button>
 
                 <div className="profit-display">
-                  <div className="grid-item bold-text">Profit from {buyAmount} $PEAS, wrapping, and selling</div>
+                  <div className="grid-item bold-text">Profit from flashloaing ${buyAmount} of $PEAS, wrapping, and selling</div>
                   <div className="grid-item green-text courier-font">${arbProfit1}</div>
-                  <div className="grid-item bold-text">Profit buying {buyAmount} $ppPP, unwrapping, and selling</div>
+                  <div className="grid-item bold-text">Profit from flashloaing ${buyAmount} of $ppPP, unwrapping, and selling</div>
                   <div className="grid-item green-text courier-font">${arbProfit2}</div>
                 </div>
 
