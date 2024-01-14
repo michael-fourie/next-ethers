@@ -10,6 +10,7 @@ const Metamask = () => {
         margin: "10px",
         padding: "20px",
         fontSize: "20px",
+        marginBottom: "50em"
       }}
     >
       <p>
